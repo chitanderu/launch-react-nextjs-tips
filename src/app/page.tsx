@@ -1,8 +1,11 @@
-import Dashboard from '@/components/Dashboard';
+import Dashboard from "@/components/Dashboard";
 
 export default function Home() {
   return (
-    <div className="min-h-screen" style={{ background: 'var(--background)', color: 'var(--foreground)' }}>
+    <div
+      className="min-h-screen"
+      style={{ background: "var(--background)", color: "var(--foreground)" }}
+    >
       <header className="header">
         <div className="container">
           <div className="header-content">
@@ -13,15 +16,16 @@ export default function Home() {
           </div>
         </div>
       </header>
-      
+
       <main>
         <Dashboard />
       </main>
-      
+
       <footer className="footer">
         <div className="container">
           <p>
-            Built for teaching React fundamentals to vibe coders and developers who want to stop getting stuck with AI tools
+            Built for teaching React fundamentals to vibe coders and developers
+            who want to stop getting stuck with AI tools
           </p>
         </div>
       </footer>

@@ -1,15 +1,22 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * File: src/components/Dashboard.tsx
- * 
+ *
  * Progressive React Tutorial - Personal Dashboard
  * Uncomment sections as you teach each pattern!
  */
 
-'use client';
+"use client";
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { useTheme } from '../contexts/ThemeContext';
-import { useLocalStorage } from '../hooks/useLocalStorage';
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+  useRef,
+} from "react";
+import { useTheme } from "../contexts/ThemeContext";
+import { useLocalStorage } from "../hooks/useLocalStorage";
 
 // =====================================
 // PATTERN 1: useState - State Management
@@ -22,11 +29,25 @@ import { useLocalStorage } from '../hooks/useLocalStorage';
 • useState is React's way of connecting data to the visual interface
 • Always use setState functions, never mutate state directly
 */
+function Dashref() {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  function handleClick() {
+    inputRef.current?.focus();
+  }
+
+  return (
+    <div>
+      <input ref={inputRef} placeholder="输入你的名字" />
+      <button onClick={handleClick}>聚焦输入框</button>
+    </div>
+  );
+}
 
 function Counter() {
   // 🐍 Python equivalent: self.count = 0 in __init__
   // But Python needs manual UI updates, React auto-updates!
-  
+
   // ❌ BAD: Variable doesn't trigger re-renders
   // let count = 0;
   // const increment = () => {
@@ -56,22 +77,46 @@ function Counter() {
         <span className="pattern-badge">useState</span>
       </h3>
       <div className="text-center mb-4">
-        <div className="text-3xl font-bold my-4">
-          {count}
-        </div>
-        <p className="text-sm mb-0" style={{ color: 'var(--muted-foreground)' }}>
+        <div className="text-3xl font-bold my-4">{count}</div>
+        <p
+          className="text-sm mb-0"
+          style={{ color: "var(--muted-foreground)" }}
+        >
           Click buttons to see automatic re-renders
         </p>
       </div>
       <div className="flex gap-2 justify-center">
-        <button onClick={decrement} className="btn btn-secondary">-</button>
-        <button onClick={reset} className="btn btn-secondary">Reset</button>
-        <button onClick={increment} className="btn btn-primary">+</button>
+        <button onClick={decrement} className="btn btn-secondary">
+          -
+        </button>
+        <button onClick={reset} className="btn btn-secondary">
+          Reset
+        </button>
+        <button onClick={increment} className="btn btn-primary">
+          +
+        </button>
       </div>
     </div>
   );
 }
 
+// =====================================
+// PATTERN 1.1: my own count
+// =====================================
+function DoubleCounter() {
+  const [doublec, setDoublec] = useState(1);
+  const incrementDouble = () => setDoublec(doublec * 2);
+
+  return (
+    <div className="widget">
+      <h3>Double Counter</h3>
+      <p>{doublec}</p>
+      <button onClick={incrementDouble} className="btn btn-primary">
+        Double It!
+      </button>
+    </div>
+  );
+}
 // =====================================
 // PATTERN 2: useEffect - Side Effects
 // =====================================
@@ -87,7 +132,7 @@ function Counter() {
 
 function Clock() {
   const [time, setTime] = useState<Date | null>(null);
-  const [showBadExample, setShowBadExample] = useState(false);
+  const [showBadExample, setShowBadExample] = useState(true);
   const [renderCount, setRenderCount] = useState(0);
 
   // // // Track renders for demonstration
@@ -108,12 +153,12 @@ function Clock() {
     if (!showBadExample) {
       // Fix hydration mismatch by only setting time after client mount
       setTime(new Date());
-      
+
       // 🐍 Python: Like __enter__ in context manager
       const timer = setInterval(() => {
         setTime(new Date());
       }, 1000);
-      
+
       // 🐍 Python: Like __exit__ in context manager
       return () => clearInterval(timer); // Cleanup prevents memory leaks
     }
@@ -126,26 +171,29 @@ function Clock() {
         Live Clock
         <span className="pattern-badge">useEffect</span>
       </h3>
-      
+
       {/* Demo Toggle */}
       <div className="mb-4 text-center">
-        <button 
+        <button
           onClick={() => setShowBadExample(!showBadExample)}
-          className={`btn ${showBadExample ? 'btn-destructive' : 'btn-secondary'}`}
+          className={`btn ${showBadExample ? "btn-destructive" : "btn-secondary"}`}
         >
-          {showBadExample ? '🛑 Stop Bad Demo' : '🔥 Show Bad Example'}
+          {showBadExample ? "🛑 Stop Bad Demo" : "🔥 Show Bad Example"}
         </button>
       </div>
 
       {/* Visual Feedback */}
       {showBadExample && (
-        <div className="rounded mb-4 text-center p-2" style={{ 
-          background: 'rgba(255, 68, 68, 0.1)'
-        }}>
-          <div className="text-sm font-bold" style={{ color: '#ff4444' }}>
+        <div
+          className="rounded mb-4 text-center p-2"
+          style={{
+            background: "rgba(255, 68, 68, 0.1)",
+          }}
+        >
+          <div className="text-sm font-bold" style={{ color: "#ff4444" }}>
             ⚠️ Renders: {renderCount} | Check console!
           </div>
-          <div className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
+          <div className="text-xs" style={{ color: "var(--muted-foreground)" }}>
             New timer created every render
           </div>
         </div>
@@ -153,13 +201,15 @@ function Clock() {
 
       <div className="text-center">
         <div className="text-2xl font-bold my-4">
-          {time ? time.toLocaleTimeString() : '--:--:-- --'}
+          {time ? time.toLocaleTimeString() : "--:--:-- --"}
         </div>
-        <p className="text-sm mb-0" style={{ color: 'var(--muted-foreground)' }}>
-          {showBadExample 
-            ? '🚨 Using setTimeout in render (creating memory leaks!)' 
-            : 'Updates every second with automatic cleanup'
-          }
+        <p
+          className="text-sm mb-0"
+          style={{ color: "var(--muted-foreground)" }}
+        >
+          {showBadExample
+            ? "🚨 Using setTimeout in render (creating memory leaks!)"
+            : "Updates every second with automatic cleanup"}
         </p>
       </div>
     </div>
@@ -189,22 +239,30 @@ function Clock() {
 
 // ✅ GOOD: Reusable component with props
 interface ButtonProps {
-  variant?: 'primary' | 'secondary' | 'destructive' | 'Sean';
+  variant?: "primary" | "secondary" | "destructive" | "Sean";
   children: React.ReactNode;
   onClick?: () => void;
   disabled?: boolean;
-  type?: 'button' | 'submit' | 'reset';
+  type?: "button" | "submit" | "reset";
   style?: React.CSSProperties;
   className?: string;
 }
 
-function Button({ variant = 'primary', children, onClick, disabled = false, type = 'button', style, className }: ButtonProps) {
+function Button({
+  variant = "primary",
+  children,
+  onClick,
+  disabled = false,
+  type = "button",
+  style,
+  className,
+}: ButtonProps) {
   // 🐍 Python: Like function parameters with defaults
   // def button(variant='primary', children=None, on_click=None, disabled=False):
-  
+
   return (
-    <button 
-      className={`btn btn-${variant} ${className || ''}`}
+    <button
+      className={`btn btn-${variant} ${className || ""}`}
       onClick={onClick}
       disabled={disabled}
       type={type}
@@ -223,23 +281,23 @@ function ButtonShowcase() {
         Button Variants
         <span className="pattern-badge">Props</span>
       </h3>
-      <p className="text-sm mb-4" style={{ color: 'var(--muted-foreground)' }}>
+      <p className="text-sm mb-4" style={{ color: "var(--muted-foreground)" }}>
         One component, multiple styles via props
       </p>
       <div className="flex flex-row gap-3 justify-center">
-        <Button variant="primary" onClick={() => alert('Primary!')}>
+        <Button variant="primary" onClick={() => alert("Primary!")}>
           Primary Button
         </Button>
-        <Button variant="secondary" onClick={() => alert('Secondary!')}>
+        <Button variant="secondary" onClick={() => alert("Secondary!")}>
           Secondary Button
         </Button>
-        <Button variant="destructive" onClick={() => alert('Danger!')}>
+        <Button variant="destructive" onClick={() => alert("Danger!")}>
           Destructive Button
         </Button>
-        <Button disabled onClick={() => alert('Never fires')}>
+        <Button disabled onClick={() => alert("Never fires")}>
           Disabled Button
         </Button>
-        <Button variant='primary' onClick={() => alert('Sean is on fire!')}>
+        <Button variant="primary" onClick={() => alert("Sean is on fire!")}>
           Sean Button
         </Button>
       </div>
@@ -276,18 +334,18 @@ function UserProfile() {
     setError(null);
     setUser(null);
     setRandomNumber(null);
-    
+
     // Simulate API call
     setTimeout(() => {
       const random = Math.random();
       // Store the random number in state to display in UI
       setRandomNumber(random);
-      console.log('Random number: ', random);
-      
+      console.log("Random number: ", random);
+
       if (random > 0.7) {
-        setError('Failed to load user data');
+        setError("Failed to load user data");
       } else {
-        setUser({ name: 'John Doe', email: 'john@example.com' });
+        setUser({ name: "John Doe", email: "john@example.com" });
       }
       setLoading(false);
     }, 2000);
@@ -317,20 +375,23 @@ function UserProfile() {
         User Profile
         <span className="pattern-badge">Conditional</span>
       </h3>
-      
+
       {loading && (
         <div className="text-center p-8">
           <div className="status-loading">Loading user data...</div>
         </div>
       )}
-      
+
       {error && (
         <div className="text-center p-8">
           <div className="status-error">❌ {error}</div>
           {randomNumber !== null && (
-            <div className="mt-2 text-sm" style={{ color: 'var(--muted-foreground)' }}>
-              Random number: <strong>{randomNumber.toFixed(3)}</strong> 
-              <span style={{ color: '#ff4444' }}> (&gt; 0.7 = Error)</span>
+            <div
+              className="mt-2 text-sm"
+              style={{ color: "var(--muted-foreground)" }}
+            >
+              Random number: <strong>{randomNumber.toFixed(3)}</strong>
+              <span style={{ color: "#ff4444" }}> (&gt; 0.7 = Error)</span>
             </div>
           )}
           <Button onClick={fetchUser} variant="secondary" className="mt-4">
@@ -338,7 +399,7 @@ function UserProfile() {
           </Button>
         </div>
       )}
-      
+
       {!loading && !error && !user && (
         <div className="text-center p-8">
           <div className="status-loading">Please log in</div>
@@ -349,14 +410,21 @@ function UserProfile() {
         <div>
           <div className="status-success">✅ User loaded successfully!</div>
           {randomNumber !== null && (
-            <div className="text-center mt-2 text-sm" style={{ color: 'var(--muted-foreground)' }}>
-              Random number: <strong>{randomNumber.toFixed(3)}</strong> 
-              <span style={{ color: '#22c55e' }}> (≤ 0.7 = Success)</span>
+            <div
+              className="text-center mt-2 text-sm"
+              style={{ color: "var(--muted-foreground)" }}
+            >
+              Random number: <strong>{randomNumber.toFixed(3)}</strong>
+              <span style={{ color: "#22c55e" }}> (≤ 0.7 = Success)</span>
             </div>
           )}
           <div className="mt-4">
-            <p><strong>Name:</strong> {user.name}</p>
-            <p><strong>Email:</strong> {user.email}</p>
+            <p>
+              <strong>Name:</strong> {user.name}
+            </p>
+            <p>
+              <strong>Email:</strong> {user.email}
+            </p>
           </div>
           <Button onClick={fetchUser} variant="secondary" className="mt-4">
             Reload User
@@ -388,20 +456,22 @@ interface Todo {
 
 function TodoList() {
   const [todos, setTodos] = useState<Todo[]>([
-    { id: 1, text: 'Learn React useState', completed: true },
-    { id: 2, text: 'Master useEffect', completed: true },
-    { id: 3, text: 'Understand props', completed: false },
-    { id: 4, text: 'Practice conditional rendering', completed: false },
-    { id: 5, text: 'Build awesome apps', completed: false },
+    { id: 1, text: "Learn React useState", completed: true },
+    { id: 2, text: "Master useEffect", completed: true },
+    { id: 3, text: "Understand props", completed: false },
+    { id: 4, text: "Practice conditional rendering", completed: false },
+    { id: 5, text: "Build awesome apps", completed: false },
   ]);
 
   const toggleTodo = (id: number) => {
-    setTodos(todos.map(todo => 
-      todo.id === id ? { ...todo, completed: !todo.completed } : todo
-    ));
+    setTodos(
+      todos.map((todo) =>
+        todo.id === id ? { ...todo, completed: !todo.completed } : todo,
+      ),
+    );
   };
 
-  const completedCount = todos.filter(todo => todo.completed).length;
+  const completedCount = todos.filter((todo) => todo.completed).length;
 
   return (
     <div className="widget">
@@ -410,21 +480,27 @@ function TodoList() {
         Learning Checklist
         <span className="pattern-badge">List Rendering</span>
       </h3>
-      
+
       <div className="mb-4">
-        <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
+        <p className="text-sm" style={{ color: "var(--muted-foreground)" }}>
           Progress: {completedCount}/{todos.length} completed
         </p>
-        <div className="h-2 rounded overflow-hidden" style={{ 
-          background: 'var(--muted)'
-        }}>
-          <div className="h-full transition-all duration-300 ease-out" style={{
-            background: 'var(--primary)',
-            width: `${(completedCount / todos.length) * 100}%`
-          }} />
+        <div
+          className="h-2 rounded overflow-hidden"
+          style={{
+            background: "var(--muted)",
+          }}
+        >
+          <div
+            className="h-full transition-all duration-300 ease-out"
+            style={{
+              background: "var(--primary)",
+              width: `${(completedCount / todos.length) * 100}%`,
+            }}
+          />
         </div>
       </div>
-      
+
       {/* ❌ BAD: No keys - React gets confused when list changes */}
       {/* <div>
         <h3>This is the bad example</h3>
@@ -440,15 +516,13 @@ function TodoList() {
       {/* 🐍 Python: Like enumerate() giving each item an index */}
       <div>
         <h3>This is the good example</h3>
-        {todos.map(todo => (
-          <div 
-            key={todo.id} 
+        {todos.map((todo) => (
+          <div
+            key={todo.id}
             onClick={() => toggleTodo(todo.id)}
-            className={`todo-item ${todo.completed ? 'todo-completed' : ''}`}
+            className={`todo-item ${todo.completed ? "todo-completed" : ""}`}
           >
-            <span className="mr-2">
-              {todo.completed ? '✅' : '⬜'}
-            </span>
+            <span className="mr-2">{todo.completed ? "✅" : "⬜"}</span>
             {todo.text}
           </div>
         ))}
@@ -485,12 +559,14 @@ interface SubmittedFormData {
 
 function ContactForm() {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    message: ''
+    name: "",
+    email: "",
+    message: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [submittedDataList, setSubmittedDataList] = useState<SubmittedFormData[]>([]);
+  const [submittedDataList, setSubmittedDataList] = useState<
+    SubmittedFormData[]
+  >([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [nextId, setNextId] = useState(1); // Counter for generating unique IDs
 
@@ -501,67 +577,76 @@ function ContactForm() {
   //   // Validation logic here
   //   setSubmitted(true);
   // };
-  
+
   // In JSX: onChange={(e) => setFormData({...formData, name: e.target.value})}
   // Creates new function every render = performance issue!
 
   // ✅ GOOD: useCallback prevents unnecessary re-renders
-  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      const { name, value } = e.target;
+      setFormData((prev) => ({
         ...prev,
-        [name]: ''
+        [name]: value,
       }));
-    }
-  }, [errors]);
 
-  const handleSubmit = useCallback((e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Simple validation
-    const newErrors: Record<string, string> = {};
-    if (!formData.name.trim()) newErrors.name = 'Name is required';
-    if (!formData.email.includes('@')) newErrors.email = 'Valid email required';
-    if (!formData.message.trim()) newErrors.message = 'Message is required';
-    
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
-    
-    // Show loading state during submission
-    setIsSubmitting(true);
-    
-    // Simulate API call delay
-    setTimeout(() => {
-      // Create new submission with unique ID
-      const newSubmission: SubmittedFormData = {
-        id: nextId,
-        ...formData,
-        submittedAt: new Date().toLocaleString()
-      };
-      
-      // Add to the list of submissions (newest first)
-      setSubmittedDataList(prev => [newSubmission, ...prev]);
-      setNextId(prev => prev + 1);
-      
-      // Clear form data and reset states
-      setFormData({ name: '', email: '', message: '' });
-      setErrors({});
-      setIsSubmitting(false);
-    }, 1500);
-  }, [formData, nextId]);
+      // Clear error when user starts typing
+      if (errors[name]) {
+        setErrors((prev) => ({
+          ...prev,
+          [name]: "",
+        }));
+      }
+    },
+    [errors],
+  );
+
+  const handleSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+
+      // Simple validation
+      const newErrors: Record<string, string> = {};
+      if (!formData.name.trim()) newErrors.name = "Name is required";
+      if (!formData.email.includes("@"))
+        newErrors.email = "Valid email required";
+      if (!formData.message.trim()) newErrors.message = "Message is required";
+
+      if (Object.keys(newErrors).length > 0) {
+        setErrors(newErrors);
+        return;
+      }
+
+      // Show loading state during submission
+      setIsSubmitting(true);
+
+      // Simulate API call delay
+      setTimeout(() => {
+        // Create new submission with unique ID
+        const newSubmission: SubmittedFormData = {
+          id: nextId,
+          ...formData,
+          submittedAt: new Date().toLocaleString(),
+        };
+
+        // Add to the list of submissions (newest first)
+        setSubmittedDataList((prev) => [newSubmission, ...prev]);
+        setNextId((prev) => prev + 1);
+
+        // Clear form data and reset states
+        setFormData({ name: "", email: "", message: "" });
+        setErrors({});
+        setIsSubmitting(false);
+      }, 1500);
+    },
+    [formData, nextId],
+  );
 
   // Delete specific submission by ID
   const handleDeleteSubmission = useCallback((id: number) => {
-    setSubmittedDataList(prev => prev.filter(submission => submission.id !== id));
+    setSubmittedDataList((prev) =>
+      prev.filter((submission) => submission.id !== id),
+    );
   }, []);
 
   // Delete all submissions
@@ -573,10 +658,14 @@ function ContactForm() {
   const submissionStats = useMemo(() => {
     return {
       total: submittedDataList.length,
-      uniqueEmails: new Set(submittedDataList.map(s => s.email)).size,
-      avgMessageLength: submittedDataList.length > 0 
-        ? Math.round(submittedDataList.reduce((sum, s) => sum + s.message.length, 0) / submittedDataList.length)
-        : 0
+      uniqueEmails: new Set(submittedDataList.map((s) => s.email)).size,
+      avgMessageLength:
+        submittedDataList.length > 0
+          ? Math.round(
+              submittedDataList.reduce((sum, s) => sum + s.message.length, 0) /
+                submittedDataList.length,
+            )
+          : 0,
     };
   }, [submittedDataList]);
 
@@ -587,25 +676,30 @@ function ContactForm() {
         Contact Form
         <span className="pattern-badge">Forms</span>
       </h3>
-      <p className="text-sm mb-4" style={{ color: 'var(--muted-foreground)' }}>
+      <p className="text-sm mb-4" style={{ color: "var(--muted-foreground)" }}>
         Controlled components with validation and multiple data persistence
       </p>
-      
+
       {/* Side-by-side layout */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        
         {/* Left side - Form */}
         <div>
-          <h4 className="text-sm font-semibold mb-3" style={{ color: 'var(--muted-foreground)' }}>
+          <h4
+            className="text-sm font-semibold mb-3"
+            style={{ color: "var(--muted-foreground)" }}
+          >
             📝 Submit Message
           </h4>
-          
+
           {isSubmitting && (
-            <div className="mb-4 p-3 rounded text-center" style={{ background: 'rgba(59, 130, 246, 0.1)' }}>
+            <div
+              className="mb-4 p-3 rounded text-center"
+              style={{ background: "rgba(59, 130, 246, 0.1)" }}
+            >
               <div className="status-loading">📤 Sending...</div>
             </div>
           )}
-          
+
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
               <input
@@ -618,7 +712,7 @@ function ContactForm() {
               />
               {errors.name && <div className="error">{errors.name}</div>}
             </div>
-            
+
             <div className="mb-4">
               <input
                 name="email"
@@ -631,7 +725,7 @@ function ContactForm() {
               />
               {errors.email && <div className="error">{errors.email}</div>}
             </div>
-            
+
             <div className="mb-4">
               <textarea
                 name="message"
@@ -643,207 +737,257 @@ function ContactForm() {
               />
               {errors.message && <div className="error">{errors.message}</div>}
             </div>
-            
+
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Sending...' : 'Send Message'}
+              {isSubmitting ? "Sending..." : "Send Message"}
             </Button>
           </form>
         </div>
-        
+
         {/* Right side - Submitted Data Display */}
         <div>
           <div className="flex justify-between items-center mb-4">
-            <h4 className="text-lg font-bold" style={{ color: 'var(--foreground)' }}>
+            <h4
+              className="text-lg font-bold"
+              style={{ color: "var(--foreground)" }}
+            >
               📋 Message History
             </h4>
             {submittedDataList.length > 0 && (
-              <Button 
-                variant="destructive" 
+              <Button
+                variant="destructive"
                 onClick={handleDeleteAll}
-                style={{ 
-                  fontSize: '12px', 
-                  padding: '6px 12px',
-                  borderRadius: '8px',
-                  fontWeight: '500'
+                style={{
+                  fontSize: "12px",
+                  padding: "6px 12px",
+                  borderRadius: "8px",
+                  fontWeight: "500",
                 }}
               >
                 🗑️ Clear All
               </Button>
             )}
           </div>
-          
+
           {/* Modern Statistics Cards */}
           {submittedDataList.length > 0 && (
             <div className="grid grid-cols-3 gap-3 mb-6">
-              <div className="text-center p-3 rounded-xl" style={{ 
-                background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%)',
-                border: '1px solid rgba(59, 130, 246, 0.2)'
-              }}>
-                <div className="text-2xl font-bold" style={{ color: 'var(--primary)' }}>
+              <div
+                className="text-center p-3 rounded-xl"
+                style={{
+                  background:
+                    "linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%)",
+                  border: "1px solid rgba(59, 130, 246, 0.2)",
+                }}
+              >
+                <div
+                  className="text-2xl font-bold"
+                  style={{ color: "var(--primary)" }}
+                >
                   {submissionStats.total}
                 </div>
-                <div className="text-xs font-medium" style={{ color: 'var(--muted-foreground)' }}>
+                <div
+                  className="text-xs font-medium"
+                  style={{ color: "var(--muted-foreground)" }}
+                >
                   Total Messages
                 </div>
               </div>
-              <div className="text-center p-3 rounded-xl" style={{ 
-                background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%)',
-                border: '1px solid rgba(16, 185, 129, 0.2)'
-              }}>
-                <div className="text-2xl font-bold" style={{ color: '#10b981' }}>
+              <div
+                className="text-center p-3 rounded-xl"
+                style={{
+                  background:
+                    "linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%)",
+                  border: "1px solid rgba(16, 185, 129, 0.2)",
+                }}
+              >
+                <div
+                  className="text-2xl font-bold"
+                  style={{ color: "#10b981" }}
+                >
                   {submissionStats.uniqueEmails}
                 </div>
-                <div className="text-xs font-medium" style={{ color: 'var(--muted-foreground)' }}>
+                <div
+                  className="text-xs font-medium"
+                  style={{ color: "var(--muted-foreground)" }}
+                >
                   Unique Senders
                 </div>
               </div>
-              <div className="text-center p-3 rounded-xl" style={{ 
-                background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%)',
-                border: '1px solid rgba(245, 158, 11, 0.2)'
-              }}>
-                <div className="text-2xl font-bold" style={{ color: '#f59e0b' }}>
+              <div
+                className="text-center p-3 rounded-xl"
+                style={{
+                  background:
+                    "linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%)",
+                  border: "1px solid rgba(245, 158, 11, 0.2)",
+                }}
+              >
+                <div
+                  className="text-2xl font-bold"
+                  style={{ color: "#f59e0b" }}
+                >
                   {submissionStats.avgMessageLength}
                 </div>
-                <div className="text-xs font-medium" style={{ color: 'var(--muted-foreground)' }}>
+                <div
+                  className="text-xs font-medium"
+                  style={{ color: "var(--muted-foreground)" }}
+                >
                   Avg Length
                 </div>
               </div>
             </div>
           )}
-          
+
           {submittedDataList.length > 0 ? (
-            <div className="space-y-4 max-h-96 overflow-y-auto pr-2" style={{
-              scrollbarWidth: 'thin',
-              scrollbarColor: 'var(--muted-foreground) transparent'
-            }}>
+            <div
+              className="space-y-4 max-h-96 overflow-y-auto pr-2"
+              style={{
+                scrollbarWidth: "thin",
+                scrollbarColor: "var(--muted-foreground) transparent",
+              }}
+            >
               {submittedDataList.map((submission, index) => (
-                <div 
-                  key={submission.id} 
-                  className="group relative p-4 rounded-2xl transition-all duration-300 hover:scale-[1.02]" 
-                  style={{ 
-                    background: 'var(--card)',
-                    border: '1px solid var(--border)',
-                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                <div
+                  key={submission.id}
+                  className="group relative p-4 rounded-2xl transition-all duration-300 hover:scale-[1.02]"
+                  style={{
+                    background: "var(--card)",
+                    border: "1px solid var(--border)",
+                    boxShadow:
+                      "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
                   }}
                 >
                   {/* Modern message header with gradient badge */}
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex items-center gap-2">
-                      <div 
+                      <div
                         className="px-3 py-1 rounded-full text-xs font-bold"
-                        style={{ 
-                          background: index === 0 
-                            ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' 
-                            : 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-                          color: 'white',
-                          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                        style={{
+                          background:
+                            index === 0
+                              ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+                              : "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+                          color: "white",
+                          boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
                         }}
                       >
                         #{submission.id}
                       </div>
                       {index === 0 && (
-                        <div 
+                        <div
                           className="px-2 py-1 rounded-full text-xs font-medium"
-                          style={{ 
-                            background: 'rgba(34, 197, 94, 0.1)',
-                            color: '#22c55e',
-                            border: '1px solid rgba(34, 197, 94, 0.2)'
+                          style={{
+                            background: "rgba(34, 197, 94, 0.1)",
+                            color: "#22c55e",
+                            border: "1px solid rgba(34, 197, 94, 0.2)",
                           }}
                         >
                           ✨ Latest
                         </div>
                       )}
                     </div>
-                    <Button 
-                      variant="destructive" 
+                    <Button
+                      variant="destructive"
                       onClick={() => handleDeleteSubmission(submission.id)}
                       className="opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                      style={{ 
-                        fontSize: '11px', 
-                        padding: '4px 8px',
-                        borderRadius: '8px',
-                        background: 'rgba(239, 68, 68, 0.1)',
-                        border: '1px solid rgba(239, 68, 68, 0.2)',
-                        color: '#ef4444'
+                      style={{
+                        fontSize: "11px",
+                        padding: "4px 8px",
+                        borderRadius: "8px",
+                        background: "rgba(239, 68, 68, 0.1)",
+                        border: "1px solid rgba(239, 68, 68, 0.2)",
+                        color: "#ef4444",
                       }}
                     >
                       ✕
                     </Button>
                   </div>
-                  
+
                   {/* Enhanced submission data with better typography */}
                   <div className="space-y-3">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs font-bold" style={{ color: 'var(--primary)' }}>
+                        <span
+                          className="text-xs font-bold"
+                          style={{ color: "var(--primary)" }}
+                        >
                           👤 SENDER
                         </span>
                       </div>
-                      <div 
+                      <div
                         className="text-sm font-medium px-3 py-2 rounded-lg"
-                        style={{ 
-                          background: 'var(--muted)',
-                          color: 'var(--foreground)'
+                        style={{
+                          background: "var(--muted)",
+                          color: "var(--foreground)",
                         }}
                       >
                         {submission.name}
                       </div>
                     </div>
-                    
+
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs font-bold" style={{ color: 'var(--primary)' }}>
+                        <span
+                          className="text-xs font-bold"
+                          style={{ color: "var(--primary)" }}
+                        >
                           📧 EMAIL
                         </span>
                       </div>
-                      <div 
+                      <div
                         className="text-sm font-mono px-3 py-2 rounded-lg"
-                        style={{ 
-                          background: 'var(--muted)',
-                          color: 'var(--foreground)',
-                          fontSize: '12px'
+                        style={{
+                          background: "var(--muted)",
+                          color: "var(--foreground)",
+                          fontSize: "12px",
                         }}
                       >
                         {submission.email}
                       </div>
                     </div>
-                    
+
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs font-bold" style={{ color: 'var(--primary)' }}>
+                        <span
+                          className="text-xs font-bold"
+                          style={{ color: "var(--primary)" }}
+                        >
                           💬 MESSAGE
                         </span>
-                        <span 
+                        <span
                           className="text-xs px-2 py-1 rounded-full"
-                          style={{ 
-                            background: 'rgba(99, 102, 241, 0.1)',
-                            color: '#6366f1'
+                          style={{
+                            background: "rgba(99, 102, 241, 0.1)",
+                            color: "#6366f1",
                           }}
                         >
                           {submission.message.length} chars
                         </span>
                       </div>
-                      <div 
+                      <div
                         className="text-sm leading-relaxed px-3 py-2 rounded-lg"
-                        style={{ 
-                          background: 'var(--muted)',
-                          color: 'var(--foreground)',
-                          lineHeight: '1.5'
+                        style={{
+                          background: "var(--muted)",
+                          color: "var(--foreground)",
+                          lineHeight: "1.5",
                         }}
                       >
                         {submission.message}
                       </div>
                     </div>
-                    
+
                     {/* Modern timestamp with icon */}
-                    <div 
+                    <div
                       className="flex items-center gap-2 pt-3 mt-3"
-                      style={{ 
-                        borderTop: '1px solid var(--border)'
+                      style={{
+                        borderTop: "1px solid var(--border)",
                       }}
                     >
                       <span className="text-xs">🕒</span>
-                      <span className="text-xs font-medium" style={{ color: 'var(--muted-foreground)' }}>
+                      <span
+                        className="text-xs font-medium"
+                        style={{ color: "var(--muted-foreground)" }}
+                      >
                         {submission.submittedAt}
                       </span>
                     </div>
@@ -852,35 +996,47 @@ function ContactForm() {
               ))}
             </div>
           ) : (
-            <div className="text-center p-12 rounded-2xl" style={{ 
-              background: 'linear-gradient(135deg, var(--muted) 0%, rgba(255,255,255,0.1) 100%)',
-              border: '2px dashed var(--border)'
-            }}>
+            <div
+              className="text-center p-12 rounded-2xl"
+              style={{
+                background:
+                  "linear-gradient(135deg, var(--muted) 0%, rgba(255,255,255,0.1) 100%)",
+                border: "2px dashed var(--border)",
+              }}
+            >
               {/* Modern empty state */}
               <div className="mb-4">
-                <div 
+                <div
                   className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4"
-                  style={{ 
-                    background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
-                    border: '2px solid rgba(99, 102, 241, 0.2)'
+                  style={{
+                    background:
+                      "linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)",
+                    border: "2px solid rgba(99, 102, 241, 0.2)",
                   }}
                 >
                   <span className="text-2xl">📭</span>
                 </div>
               </div>
-              <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--foreground)' }}>
+              <h3
+                className="text-lg font-bold mb-2"
+                style={{ color: "var(--foreground)" }}
+              >
                 No Messages Yet
               </h3>
-              <p className="text-sm leading-relaxed" style={{ color: 'var(--muted-foreground)' }}>
-                Submit your first message using the form<br />
+              <p
+                className="text-sm leading-relaxed"
+                style={{ color: "var(--muted-foreground)" }}
+              >
+                Submit your first message using the form
+                <br />
                 to see it beautifully displayed here!
               </p>
-              <div 
+              <div
                 className="inline-block mt-4 px-4 py-2 rounded-full text-xs font-medium"
-                style={{ 
-                  background: 'rgba(99, 102, 241, 0.1)',
-                  color: '#6366f1',
-                  border: '1px solid rgba(99, 102, 241, 0.2)'
+                style={{
+                  background: "rgba(99, 102, 241, 0.1)",
+                  color: "#6366f1",
+                  border: "1px solid rgba(99, 102, 241, 0.2)",
                 }}
               >
                 ✨ Ready for your first message
@@ -929,7 +1085,7 @@ function ContactForm() {
 function ThemeToggle() {
   // Using the custom hook from our contexts folder
   const { theme, toggleTheme } = useTheme();
-  
+
   return (
     <div className="widget">
       <h3>
@@ -937,7 +1093,7 @@ function ThemeToggle() {
         Theme Switcher
         <span className="pattern-badge">Context API</span>
       </h3>
-      <p className="text-sm mb-4" style={{ color: 'var(--muted-foreground)' }}>
+      <p className="text-sm mb-4" style={{ color: "var(--muted-foreground)" }}>
         Global state without prop drilling
       </p>
       <div className="text-center">
@@ -945,7 +1101,7 @@ function ThemeToggle() {
           Current theme: <strong>{theme}</strong>
         </div>
         <Button onClick={toggleTheme}>
-          Switch to {theme === 'light' ? '🌙 Dark' : '☀️ Light'} mode
+          Switch to {theme === "light" ? "🌙 Dark" : "☀️ Light"} mode
         </Button>
       </div>
     </div>
@@ -970,32 +1126,37 @@ function ThemeToggle() {
 // Note: The actual implementation is now in src/hooks/useLocalStorage.ts for better organization
 
 function NotesWidget() {
-  const [notes, setNotes] = useLocalStorage<string[]>('tutorial-notes', []);
-  const [newNote, setNewNote] = useState('');
+  const [notes, setNotes] = useLocalStorage<string[]>("tutorial-notes", []);
+  const [newNote, setNewNote] = useState("");
 
   // ❌ BAD: Expensive calculation runs on every render (even when notes don't change)
   // const noteStats = {
   //   total: notes.length,
-  //   long: notes.filter(note => note.length > 10).length,
-  //   avgLength: notes.reduce((sum, note) => sum + note.length, 0) / notes.length
+  //   long: notes.filter((note) => note.length > 10).length,
+  //   avgLength: notes.reduce((sum, note) => sum + note.length, 0) / notes.length,
   // };
-  // console.log('📊 Calculating note statistics...'); // This runs on EVERY render!
+  // console.log("📊 Calculating note statistics..."); // This runs on EVERY render!
 
   // ✅ GOOD: useMemo only recalculates when notes change
   // 🐍 Python: Like @lru_cache decorator
   const noteStats = useMemo(() => {
-    console.log('📊 Calculating note statistics...'); // You'll only see this when notes change
+    console.log("📊 Calculating note statistics..."); // You'll only see this when notes change
     return {
       total: notes.length,
-      long: notes.filter(note => note.length > 10).length,
-      avgLength: notes.length > 0 ? Math.round(notes.reduce((sum, note) => sum + note.length, 0) / notes.length) : 0
+      long: notes.filter((note) => note.length > 10).length,
+      avgLength:
+        notes.length > 0
+          ? Math.round(
+              notes.reduce((sum, note) => sum + note.length, 0) / notes.length,
+            )
+          : 0,
     };
   }, [notes]);
 
   const addNote = useCallback(() => {
     if (newNote.trim()) {
       setNotes([...notes, newNote.trim()]);
-      setNewNote('');
+      setNewNote("");
     }
   }, [notes, newNote, setNotes]);
 
@@ -1010,24 +1171,33 @@ function NotesWidget() {
         Smart Notes
         <span className="pattern-badge">Custom Hooks</span>
       </h3>
-      
-      <div className="grid grid-cols-3 gap-2 text-center p-3 rounded mb-4" style={{ 
-        background: 'var(--muted)'
-      }}>
+
+      <div
+        className="grid grid-cols-3 gap-2 text-center p-3 rounded mb-4"
+        style={{
+          background: "var(--muted)",
+        }}
+      >
         <div>
           <div className="font-bold">{noteStats.total}</div>
-          <div className="text-xs" style={{ color: 'var(--muted-foreground)' }}>Notes</div>
+          <div className="text-xs" style={{ color: "var(--muted-foreground)" }}>
+            Notes
+          </div>
         </div>
         <div>
           <div className="font-bold">{noteStats.long}</div>
-          <div className="text-xs" style={{ color: 'var(--muted-foreground)' }}>Long</div>
+          <div className="text-xs" style={{ color: "var(--muted-foreground)" }}>
+            Long
+          </div>
         </div>
         <div>
           <div className="font-bold">{noteStats.avgLength}</div>
-          <div className="text-xs" style={{ color: 'var(--muted-foreground)' }}>Avg chars</div>
+          <div className="text-xs" style={{ color: "var(--muted-foreground)" }}>
+            Avg chars
+          </div>
         </div>
       </div>
-      
+
       <div className="mb-4">
         <div className="flex gap-2">
           <input
@@ -1035,17 +1205,20 @@ function NotesWidget() {
             onChange={(e) => setNewNote(e.target.value)}
             placeholder="Add a note..."
             className="input flex-1"
-            onKeyPress={(e) => e.key === 'Enter' && addNote()}
+            onKeyPress={(e) => e.key === "Enter" && addNote()}
           />
           <Button onClick={addNote}>Add</Button>
         </div>
       </div>
-      
+
       <div className="max-h-48 overflow-y-auto">
         {notes.length === 0 ? (
-          <p className="text-sm text-center p-4" style={{ 
-            color: 'var(--muted-foreground)'
-          }}>
+          <p
+            className="text-sm text-center p-4"
+            style={{
+              color: "var(--muted-foreground)",
+            }}
+          >
             No notes yet. Add one above!
           </p>
         ) : (
@@ -1056,7 +1229,7 @@ function NotesWidget() {
           ))
         )}
       </div>
-      
+
       {notes.length > 0 && (
         <div className="mt-4 text-center">
           <Button variant="destructive" onClick={clearNotes}>
@@ -1090,9 +1263,7 @@ function Section({ number, title, description, children }: SectionProps) {
             <div className="section-description">{description}</div>
           </div>
         </div>
-        <div className="widgets-grid">
-          {children}
-        </div>
+        <div className="widgets-grid">{children}</div>
       </div>
     </div>
   );
@@ -1115,60 +1286,67 @@ function DashboardContent() {
         description="useState + useEffect - The foundation of React components"
       >
         <Counter />
+        <DoubleCounter />
         <Clock />
       </Section>
+      <Section
+        number={1.5}
+        title="State Management"
+        description="useState + useEffect - The foundation of React components"
+      >
+        <Dashref />
+      </Section>
+      <Section
+        number={2}
+        title="Component Architecture"
+        description="Props & Composition - Building reusable components"
+      >
+        <ButtonShowcase />
+      </Section>
 
-        <Section
-          number={2}
-          title="Component Architecture"
-          description="Props & Composition - Building reusable components"
-        >
-          <ButtonShowcase />
-        </Section>
+      <Section
+        number={3}
+        title="Conditional Rendering"
+        description="Showing the right content at the right time (Loading states, error states, feature flags)"
+      >
+        <UserProfile />
+      </Section>
 
-        <Section
-          number={3}
-          title="Conditional Rendering"
-          description="Showing the right content at the right time (Loading states, error states, feature flags)"
-        >
-          <UserProfile />
-        </Section>
+      <Section
+        number={4}
+        title="Data Display"
+        description="List Rendering & Keys - Efficiently displaying arrays of data"
+      >
+        <TodoList />
+      </Section>
 
-        <Section
-          number={4}
-          title="Data Display"
-          description="List Rendering & Keys - Efficiently displaying arrays of data"
-        >
-          <TodoList />
-        </Section>
+      <Section
+        number={5}
+        title="User Interaction"
+        description="Event Handling & Forms - Managing user input and validation"
+      >
+        <ContactForm />
+      </Section>
 
-        <Section
-          number={5}
-          title="User Interaction"
-          description="Event Handling & Forms - Managing user input and validation"
-        >
-          <ContactForm />
-        </Section>
+      <Section
+        number={6}
+        title="Global State"
+        description="Context API - Sharing state across components without prop drilling - useCallback"
+      >
+        <ThemeToggle />
+      </Section>
 
-        <Section
-          number={6}
-          title="Global State"
-          description="Context API - Sharing state across components without prop drilling - useCallback"
-        >
-          <ThemeToggle />
-        </Section>
-
-        <Section
-          number={7}
-          title="Advanced Patterns"
-          description="Custom Hooks & Performance - Reusable logic and optimization"
-        >
-          <NotesWidget />
-        </Section>
-      </div>
-    );
+      <Section
+        number={7}
+        title="Advanced Patterns"
+        description="Custom Hooks & Performance - Reusable logic and optimization"
+      >
+        <NotesWidget />
+      </Section>
+    </div>
+  );
 }
 
 export default function Dashboard() {
   return <DashboardContent />;
-} 
+}
